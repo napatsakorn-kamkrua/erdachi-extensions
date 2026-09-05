@@ -9,6 +9,16 @@
       "sha256": "fd1b21a84203891a79f75bdc84aee49edbb9e0b4e8ca75cd77ddf27d801d29ad"
     }
   },
+  "eu.kanade.tachiyomi.extension.th.doujinth": {
+    "apk": {
+      "name": "tachiyomi-th.doujinth-v1.6.1.apk",
+      "sha256": "35a8484979faaad658d70d689b1429baed04a2f7e4ea7f35a1e4bacdc6f4a92e"
+    },
+    "jar": {
+      "name": "tachiyomi-th.doujinth-v1.6.1.jar",
+      "sha256": "4e3662b441029bc44e75375f8d6863bcb7360b58e67efeba0f5d48b0edbd265b"
+    }
+  },
   "eu.kanade.tachiyomi.extension.th.hentaithai": {
     "apk": {
       "name": "tachiyomi-th.hentaithai-v1.6.1.apk",

@@ -29,6 +29,27 @@
         ]
       },
       {
+        "name": "DoujinTH",
+        "packageName": "eu.kanade.tachiyomi.extension.th.doujinth",
+        "resources": {
+          "apkUrl": "https://github.com/napatsakorn-kamkrua/erdachi-extensions/releases/download/6f8992d/tachiyomi-th.doujinth-v1.6.1.apk",
+          "iconUrl": "https://cdn.jsdelivr.net/gh/napatsakorn-kamkrua/erdachi-extensions@main/src/th/doujinth/res/mipmap-xhdpi/ic_launcher.png",
+          "jarUrl": "https://github.com/napatsakorn-kamkrua/erdachi-extensions/releases/download/6f8992d/tachiyomi-th.doujinth-v1.6.1.jar"
+        },
+        "extensionLib": "1.6",
+        "versionCode": "106001",
+        "versionName": "1.6.1",
+        "contentWarning": "CONTENT_WARNING_NSFW",
+        "sources": [
+          {
+            "id": "4606417076549149814",
+            "name": "DoujinTH",
+            "language": "th",
+            "homeUrl": "https://doujin-th.com"
+          }
+        ]
+      },
+      {
         "name": "HentaiThai",
         "packageName": "eu.kanade.tachiyomi.extension.th.hentaithai",
         "resources": {
