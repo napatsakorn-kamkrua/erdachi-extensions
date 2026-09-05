@@ -25,6 +25,7 @@ Sources maintained in this hub:
 | Source | Language | Site | Status | Version |
 |---|---|---|---|---|
 | BKKManga | Thai | [bkkmanga.com](https://bkkmanga.com) | ✅ Working | 1.6.56 |
+| HentaiThai | Thai | [hentaithai.net](https://hentaithai.net) | ✅ Working | 1.6.1 |
 
 > The table above lists personally maintained sources. Sources pulled in from upstream syncs
 > also become available through the same repository URL; the full machine-readable catalog is
