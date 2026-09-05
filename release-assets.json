@@ -8,5 +8,15 @@
       "name": "tachiyomi-th.bkkmanga-v1.6.56.jar",
       "sha256": "fd1b21a84203891a79f75bdc84aee49edbb9e0b4e8ca75cd77ddf27d801d29ad"
     }
+  },
+  "eu.kanade.tachiyomi.extension.th.hentaithai": {
+    "apk": {
+      "name": "tachiyomi-th.hentaithai-v1.6.1.apk",
+      "sha256": "02c1f6056b62c667ca50437508ddbd177d63e1cb21363c748a62e68b46366e39"
+    },
+    "jar": {
+      "name": "tachiyomi-th.hentaithai-v1.6.1.jar",
+      "sha256": "0e89b24b1d8ed5c369517032e95c85be51fb9635a7802b186bb388719fd3fbcc"
+    }
   }
 }
