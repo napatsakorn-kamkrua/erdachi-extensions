@@ -1,1 +1,12 @@
-{}
+{
+  "eu.kanade.tachiyomi.extension.th.bkkmanga": {
+    "apk": {
+      "name": "tachiyomi-th.bkkmanga-v1.6.55.apk",
+      "sha256": "7e56c7f3347477d2b5ba04aeff9607dcd8d2f029ba6986927f9fe967aa3a160d"
+    },
+    "jar": {
+      "name": "tachiyomi-th.bkkmanga-v1.6.55.jar",
+      "sha256": "5d02573d2144b577a50a974891d970fd61b90ab74c3bbcb7cba337865fdd5336"
+    }
+  }
+}
