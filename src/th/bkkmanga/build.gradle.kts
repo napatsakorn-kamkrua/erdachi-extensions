@@ -1,18 +1,18 @@
 import io.github.keiyoushi.gradle.api.ContentWarning
 
 plugins {
-	alias(kei.plugins.extension)
+    alias(kei.plugins.extension)
 }
 
 keiyoushi {
-	name = "BKKManga"
-	theme = "madara"
-	versionCode = 0
-	contentWarning = ContentWarning.MIXED
-	libVersion = "1.6"
+    name = "BKKManga"
+    theme = "madara"
+    versionCode = 0
+    contentWarning = ContentWarning.MIXED
+    libVersion = "1.6"
 
-	source {
-		baseUrl = "https://bkkmanga.com"
-		lang = "th"
-	}
+    source {
+        baseUrl = "https://bkkmanga.com"
+        lang = "th"
+    }
 }
