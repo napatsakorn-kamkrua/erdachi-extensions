@@ -36,11 +36,9 @@ abstract class HentaiThai : KeiSource() {
     private var latestMaxPage = 0
     private var popularMaxPage = 0
 
-    override suspend fun getLatestUpdates(page: Int): MangasPage =
-        getBrowsingPage(page, path = "page", maxPage = { latestMaxPage }, setMaxPage = { latestMaxPage = it })
+    override suspend fun getLatestUpdates(page: Int): MangasPage = getBrowsingPage(page, path = "page", maxPage = { latestMaxPage }, setMaxPage = { latestMaxPage = it })
 
-    override suspend fun getPopularManga(page: Int): MangasPage =
-        getBrowsingPage(page, path = "$POPULAR_TAG-page", maxPage = { popularMaxPage }, setMaxPage = { popularMaxPage = it })
+    override suspend fun getPopularManga(page: Int): MangasPage = getBrowsingPage(page, path = "$POPULAR_TAG-page", maxPage = { popularMaxPage }, setMaxPage = { popularMaxPage = it })
 
     private suspend fun getBrowsingPage(
         page: Int,
@@ -63,10 +61,9 @@ abstract class HentaiThai : KeiSource() {
         return parseMangasPage(document, hasNextPage = sitePage > 1)
     }
 
-    private fun Document.currentMaxPage(): Int =
-        select("option[selected]")
-            .firstOrNull { it.attr("value").contains("page-", ignoreCase = true) }
-            ?.text()?.toIntOrNull() ?: 1
+    private fun Document.currentMaxPage(): Int = select("option[selected]")
+        .firstOrNull { it.attr("value").contains("page-", ignoreCase = true) }
+        ?.text()?.toIntOrNull() ?: 1
 
     private fun parseMangasPage(document: Document, hasNextPage: Boolean): MangasPage {
         val thumbnails = document.select("style")
@@ -204,10 +201,9 @@ abstract class HentaiThai : KeiSource() {
 
     // Only the dated CDN paths are actual manga pages; other img-fluid images
     // are site banners (e.g. /image/other/, /image/sticker/).
-    private fun pageImageUrls(document: Document): List<String> =
-        document.select("img.img-fluid")
-            .map { it.attr("abs:src") }
-            .filter { pageImageRegex.containsMatchIn(it) }
+    private fun pageImageUrls(document: Document): List<String> = document.select("img.img-fluid")
+        .map { it.attr("abs:src") }
+        .filter { pageImageRegex.containsMatchIn(it) }
 }
 
 private val thumbnailStyleRegex = Regex("""\.post_(\d+)\s*\{[^}]*?url\('([^']+)'\)""")
