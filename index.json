@@ -50,6 +50,27 @@
         ]
       },
       {
+        "name": "DoujinThai",
+        "packageName": "eu.kanade.tachiyomi.extension.th.doujinthai",
+        "resources": {
+          "apkUrl": "https://github.com/napatsakorn-kamkrua/erdachi-extensions/releases/download/ea5be3a/tachiyomi-th.doujinthai-v1.6.1.apk",
+          "iconUrl": "https://cdn.jsdelivr.net/gh/napatsakorn-kamkrua/erdachi-extensions@main/src/th/doujinthai/res/mipmap-xhdpi/ic_launcher.png",
+          "jarUrl": "https://github.com/napatsakorn-kamkrua/erdachi-extensions/releases/download/ea5be3a/tachiyomi-th.doujinthai-v1.6.1.jar"
+        },
+        "extensionLib": "1.6",
+        "versionCode": "106001",
+        "versionName": "1.6.1",
+        "contentWarning": "CONTENT_WARNING_NSFW",
+        "sources": [
+          {
+            "id": "7157263429760838449",
+            "name": "DoujinThai",
+            "language": "th",
+            "homeUrl": "https://doujin-thai.com"
+          }
+        ]
+      },
+      {
         "name": "HentaiThai",
         "packageName": "eu.kanade.tachiyomi.extension.th.hentaithai",
         "resources": {
@@ -67,6 +88,27 @@
             "name": "HentaiThai",
             "language": "th",
             "homeUrl": "https://hentaithai.net"
+          }
+        ]
+      },
+      {
+        "name": "HxHAni",
+        "packageName": "eu.kanade.tachiyomi.extension.th.hxhani",
+        "resources": {
+          "apkUrl": "https://github.com/napatsakorn-kamkrua/erdachi-extensions/releases/download/ea5be3a/tachiyomi-th.hxhani-v1.6.1.apk",
+          "iconUrl": "https://cdn.jsdelivr.net/gh/napatsakorn-kamkrua/erdachi-extensions@main/src/th/hxhani/res/mipmap-xhdpi/ic_launcher.png",
+          "jarUrl": "https://github.com/napatsakorn-kamkrua/erdachi-extensions/releases/download/ea5be3a/tachiyomi-th.hxhani-v1.6.1.jar"
+        },
+        "extensionLib": "1.6",
+        "versionCode": "106001",
+        "versionName": "1.6.1",
+        "contentWarning": "CONTENT_WARNING_NSFW",
+        "sources": [
+          {
+            "id": "8274485035975411702",
+            "name": "HxHAni",
+            "language": "th",
+            "homeUrl": "https://hxhani.com"
           }
         ]
       }

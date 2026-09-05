@@ -19,6 +19,16 @@
       "sha256": "4e3662b441029bc44e75375f8d6863bcb7360b58e67efeba0f5d48b0edbd265b"
     }
   },
+  "eu.kanade.tachiyomi.extension.th.doujinthai": {
+    "apk": {
+      "name": "tachiyomi-th.doujinthai-v1.6.1.apk",
+      "sha256": "31d4bdd3e95ae5646da6aca04391a6086fbde331cde89e28f41348643d6b8fd7"
+    },
+    "jar": {
+      "name": "tachiyomi-th.doujinthai-v1.6.1.jar",
+      "sha256": "a9b56d6d7f6289770b76365bd629b2a09c678fb91836161cf82393f305b9c8d9"
+    }
+  },
   "eu.kanade.tachiyomi.extension.th.hentaithai": {
     "apk": {
       "name": "tachiyomi-th.hentaithai-v1.6.1.apk",
@@ -27,6 +37,16 @@
     "jar": {
       "name": "tachiyomi-th.hentaithai-v1.6.1.jar",
       "sha256": "0e89b24b1d8ed5c369517032e95c85be51fb9635a7802b186bb388719fd3fbcc"
+    }
+  },
+  "eu.kanade.tachiyomi.extension.th.hxhani": {
+    "apk": {
+      "name": "tachiyomi-th.hxhani-v1.6.1.apk",
+      "sha256": "11ebf2d7d2adc7540f840940c579809a15492bee6740132c26360cae6547ebce"
+    },
+    "jar": {
+      "name": "tachiyomi-th.hxhani-v1.6.1.jar",
+      "sha256": "47d346e0d630bb4b1dcc73f40d761d9e296605c9bcc76ce6404a5a79cb0591ef"
     }
   }
 }
