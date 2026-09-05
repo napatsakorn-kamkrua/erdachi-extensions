@@ -1,5 +1,7 @@
 # Erdachi Extensions
 
+[![CI](https://github.com/napatsakorn-kamkrua/erdachi-extensions/actions/workflows/build_push.yml/badge.svg)](https://github.com/napatsakorn-kamkrua/erdachi-extensions/actions/workflows/build_push.yml)
+
 Personal manga extension hub for Tachiyomi-family reader apps (Tachimanga, Mihon, and forks),
 built on a fork of [keiyoushi/extensions-source](https://github.com/keiyoushi/extensions-source).
 Every push to `main` is built and signed automatically by GitHub Actions, and published as an
@@ -22,7 +24,7 @@ Sources maintained in this hub:
 
 | Source | Language | Site | Status | Version |
 |---|---|---|---|---|
-| BKKManga | Thai | [bkkmanga.com](https://bkkmanga.com) | ✅ Working | 1.6.55 |
+| BKKManga | Thai | [bkkmanga.com](https://bkkmanga.com) | ✅ Working | 1.6.56 |
 
 > The table above lists personally maintained sources. Sources pulled in from upstream syncs
 > also become available through the same repository URL; the full machine-readable catalog is
