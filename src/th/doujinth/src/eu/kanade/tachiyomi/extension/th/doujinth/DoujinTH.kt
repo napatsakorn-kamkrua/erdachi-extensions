@@ -33,11 +33,9 @@ abstract class DoujinTH : KeiSource() {
     // Both listings are the forum backend rendered in the gallery skin, paginated
     // by offset. The pager select lists every page, so a next page exists when any
     // option's start offset is beyond the current one.
-    override suspend fun getLatestUpdates(page: Int): MangasPage =
-        getListingPage(page, { "$baseUrl/forum/index.php/board,1.${it * PAGE_SIZE}.html" }, boardStartRegex)
+    override suspend fun getLatestUpdates(page: Int): MangasPage = getListingPage(page, { "$baseUrl/forum/index.php/board,1.${it * PAGE_SIZE}.html" }, boardStartRegex)
 
-    override suspend fun getPopularManga(page: Int): MangasPage =
-        getListingPage(page, { "$baseUrl/forum/index.php?action=tags&tagid=$POPULAR_TAG_ID&start=${it * PAGE_SIZE}" }, tagStartRegex)
+    override suspend fun getPopularManga(page: Int): MangasPage = getListingPage(page, { "$baseUrl/forum/index.php?action=tags&tagid=$POPULAR_TAG_ID&start=${it * PAGE_SIZE}" }, tagStartRegex)
 
     private suspend fun getListingPage(page: Int, url: (Int) -> String, startRegex: Regex): MangasPage {
         val start = page - 1
@@ -45,11 +43,10 @@ abstract class DoujinTH : KeiSource() {
         return parseMangasPage(document, hasNextPage = document.hasNextStart(start, startRegex))
     }
 
-    private fun Document.hasNextStart(currentStart: Int, startRegex: Regex): Boolean =
-        select("option").any { option ->
-            val start = startRegex.find(option.attr("value"))?.groupValues?.get(1)?.toIntOrNull()
-            start != null && start > currentStart
-        }
+    private fun Document.hasNextStart(currentStart: Int, startRegex: Regex): Boolean = select("option").any { option ->
+        val start = startRegex.find(option.attr("value"))?.groupValues?.get(1)?.toIntOrNull()
+        start != null && start > currentStart
+    }
 
     private fun parseMangasPage(document: Document, hasNextPage: Boolean): MangasPage {
         val thumbnails = document.select("style")
