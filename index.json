@@ -1,1 +1,9 @@
-{}
+{
+  "name": "Erdachi",
+  "badgeLabel": "EE",
+  "signingKey": "44768e593130bc7bf979f4038897b7781dc52f18c90373a3b424eed3b43bfc62",
+  "contact": {
+    "website": "https://github.com/napatsakorn-kamkrua/erdachi-extensions"
+  },
+  "extensionList": {}
+}
