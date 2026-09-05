@@ -11,13 +11,13 @@
         "name": "BKKManga",
         "packageName": "eu.kanade.tachiyomi.extension.th.bkkmanga",
         "resources": {
-          "apkUrl": "https://github.com/napatsakorn-kamkrua/erdachi-extensions/releases/download/22313bc/tachiyomi-th.bkkmanga-v1.6.55.apk",
-          "iconUrl": "https://cdn.jsdelivr.net/gh/napatsakorn-kamkrua/erdachi-extensions@main/lib-multisrc/madara/res/mipmap-xhdpi/ic_launcher.png",
-          "jarUrl": "https://github.com/napatsakorn-kamkrua/erdachi-extensions/releases/download/22313bc/tachiyomi-th.bkkmanga-v1.6.55.jar"
+          "apkUrl": "https://github.com/napatsakorn-kamkrua/erdachi-extensions/releases/download/899ad80/tachiyomi-th.bkkmanga-v1.6.56.apk",
+          "iconUrl": "https://cdn.jsdelivr.net/gh/napatsakorn-kamkrua/erdachi-extensions@main/src/th/bkkmanga/res/mipmap-xhdpi/ic_launcher.png",
+          "jarUrl": "https://github.com/napatsakorn-kamkrua/erdachi-extensions/releases/download/899ad80/tachiyomi-th.bkkmanga-v1.6.56.jar"
         },
         "extensionLib": "1.6",
-        "versionCode": "106055",
-        "versionName": "1.6.55",
+        "versionCode": "106056",
+        "versionName": "1.6.56",
         "contentWarning": "CONTENT_WARNING_MIXED",
         "sources": [
           {
