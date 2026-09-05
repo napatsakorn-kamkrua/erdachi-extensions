@@ -96,12 +96,12 @@ abstract class HentaiThai : KeiSource() {
     override suspend fun getSearchMangaList(page: Int, query: String, filters: FilterList): MangasPage {
         if (query.isBlank()) return getPopularManga(page)
 
-        val url = SEARCH_BASE.toHttpUrl().newBuilder()
+        val searchUrl = SEARCH_BASE.toHttpUrl().newBuilder()
             .addQueryParameter("q", "site:hentaithai.net ${query.trim()}")
             .addQueryParameter("s", (10 * (page - 1)).toString())
             .build()
 
-        val document = client.get(url).asJsoup()
+        val document = client.get(searchUrl).asJsoup()
         val mangas = document.select("a.result__a")
             .mapNotNull { element ->
                 val link = element.absUrl("href").let { href ->
