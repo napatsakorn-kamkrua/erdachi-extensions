@@ -1,35 +1,66 @@
-# Keiyoushi Extensions
+# Erdachi Extensions
 
-### Please give the repo a :star:
+Personal manga extension hub for Tachiyomi-family reader apps (Tachimanga, Mihon, and forks),
+built on a fork of [keiyoushi/extensions-source](https://github.com/keiyoushi/extensions-source).
+Every push to `main` is built and signed automatically by GitHub Actions, and published as an
+extension repository that reader apps consume directly.
 
-| Build                                                                                                                                                                               | Need Help?                                                                                                                                              |
-|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| [![CI](https://github.com/keiyoushi/extensions-source/actions/workflows/build_push.yml/badge.svg)](https://github.com/keiyoushi/extensions-source/actions/workflows/build_push.yml) | [![Discord](https://img.shields.io/discord/1193460528052453448.svg?label=discord&labelColor=7289da&color=2c2f33&style=flat)](https://discord.gg/3FbCpdKbdY) |
+## Add this repo to your reader app
 
-## Usage
-**If you are new to repository/extensions, please read the [Keiyoushi Getting Started guide](https://keiyoushi.github.io/docs/guides/getting-started#adding-the-extension-repo) first.**
+In your app: **Settings → Extensions → extension repositories (puzzle icon) → Add repository**,
+then paste:
 
-* You can add our repo by visiting the [Keiyoushi Website](https://keiyoushi.github.io/add-repo)
-* Otherwise, copy & paste the following URL: https://github.com/keiyoushi/extensions/raw/repo/index.pb
+```
+https://raw.githubusercontent.com/napatsakorn-kamkrua/erdachi-extensions/repo/index.json
+```
 
-## Requests
+New sources appear in the app automatically after each release — no manual installation.
 
-To request a new source or bug fix, [create an issue](https://github.com/keiyoushi/extensions-source/issues/new/choose).
+## Source catalog
 
-Please note that creating an issue does not mean that the source will be added or fixed in a timely
-fashion, because the work is volunteer-based. Some sources may also be impossible to do or prohibitively
-difficult to maintain.
+Sources maintained in this hub:
 
-If you would like to see a request fulfilled and have the necessary skills to do so, consider contributing!
-Issues are up-for-grabs for any developer if there is no assigned user already.
+| Source | Language | Site | Status | Version |
+|---|---|---|---|---|
+| BKKManga | Thai | [bkkmanga.com](https://bkkmanga.com) | ✅ Working | 1.6.55 |
 
-## Contributing
+> The table above lists personally maintained sources. Sources pulled in from upstream syncs
+> also become available through the same repository URL; the full machine-readable catalog is
+> always [`repo/index.json`](https://github.com/napatsakorn-kamkrua/erdachi-extensions/blob/repo/index.json).
 
-Contributions are welcome!
+**Planned:** more Thai sites — will be added to this table as they land.
 
-Check out the repo's [issue backlog](https://github.com/keiyoushi/extensions-source/issues) for source requests and bug reports.
+## Agent skills
 
-## License
+This repo is maintained with the help of two AI-agent skills (copies live in
+[`skills/`](./skills), canonical versions in the owner's `~/.agents/skills/`):
+
+| Skill | Purpose |
+|---|---|
+| `erdachi-add-source` | Full procedure for turning a new manga site into an extension here: detect the site's engine, verify endpoints, scaffold with `ext-bootstrap.py`, publish, verify |
+| `erdachi-sync-upstream` | Safely pull fixes from upstream Keiyoushi (broken source? check there first), keeping this hub's CI customizations intact |
+
+Any AI agent that can read these files can operate this repo with them.
+
+## How this repo works
+
+- `src/<lang>/<name>/` — one extension per folder; most sites reuse a shared site-engine
+  template from `lib-multisrc/` (e.g. WordPress "Madara" sites → `madara`).
+- CI (`.github/workflows/build_push.yml`) builds only the extensions changed by a push, signs
+  them with the hub's own key (stored in GitHub secrets), creates a GitHub release, and updates
+  the `repo` branch index.
+- The signing key never leaves GitHub secrets; never regenerate it — installed extensions
+  would stop updating.
+
+## Syncing with upstream
+
+This fork tracks upstream for template and source fixes. Sync is on-demand (see
+`erdachi-sync-upstream` skill), not automatic. On merge conflicts in `.github/` files or
+`README.md`, always keep this repo's versions.
+
+## License & Disclaimer
+
+This project is based on [keiyoushi/extensions-source](https://github.com/keiyoushi/extensions-source).
 
     Copyright 2015 Javier Tomás
 
@@ -45,9 +76,5 @@ Check out the repo's [issue backlog](https://github.com/keiyoushi/extensions-sou
     See the License for the specific language governing permissions and
     limitations under the License.
 
-## Disclaimer
-
-This project does not have any affiliation with the content providers available.
-
-This project is not affiliated with Mihon/Tachiyomi. Don't ask for help about these extensions at the
-official support means of Mihon/Tachiyomi. All credits to the codebase goes to the original contributors.
+This project is not affiliated with the content providers available through the sources, nor
+with Mihon/Tachiyomi. All credits for the codebase go to the original contributors.
