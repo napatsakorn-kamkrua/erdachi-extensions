@@ -21,7 +21,7 @@ may be any language.
 | Reader app | Tachimanga (iOS). Repo URL configured once; new sources appear automatically |
 | App repo URL | `https://raw.githubusercontent.com/napatsakorn-kamkrua/erdachi-extensions/repo/index.json` |
 | Signing | Secrets `SIGNING_KEY`, `ALIAS`, `KEY_STORE_PASSWORD`, `KEY_PASSWORD`, `SIGNING_KEY_SHA256` already set. CI signs automatically. Never commit any `*.jks` |
-| Key backup | A local backup of the signing key exists in a folder *outside and next to* the repo — never committed, never published. Ask the user for its exact location if a key restore is ever needed |
+| Key backup | The signing key is backed up in a folder *outside and next to* the repo (never committed there) AND in the private repo `napatsakorn-kamkrua/erdachi-backup`. Never publish key material; ask the user before any key operation |
 | CI | `.github/workflows/build_push.yml` on push to main: builds only changed modules, publishes release + updates `repo` branch `index.json` |
 | Target app install path | nothing to do per-source; the app picks the source up from `index.json` |
 

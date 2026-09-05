@@ -49,10 +49,11 @@ Any AI agent that can read these files can operate this repo with them.
 - CI (`.github/workflows/build_push.yml`) builds only the extensions changed by a push, signs
   them with the hub's own key (stored in GitHub secrets), creates a GitHub release, and updates
   the `repo` branch index.
-- **Signing key:** lives in GitHub secrets, with a local backup stored outside this repository
-  (it is deliberately not part of this clone — check the folder next to this repo on the owner's
-  machine). Never regenerate it — installed extensions would stop updating. If the secrets are
-  ever lost, restore them from that backup instead.
+- **Signing key:** lives in GitHub secrets, with backups in a folder next to this repo on the
+  owner's machine and in the **private** repo
+  [`napatsakorn-kamkrua/erdachi-backup`](https://github.com/napatsakorn-kamkrua/erdachi-backup)
+  (must never be made public). Never regenerate it — installed extensions would stop updating.
+  If the secrets are ever lost, restore them from a backup instead.
 
 ## Syncing with upstream
 

@@ -99,8 +99,9 @@ its next extension refresh, and the new catalog size if it grew.
 - If a push produces no CI run, dispatch manually:
   `gh workflow run build_push.yml --repo napatsakorn-kamkrua/erdachi-extensions --ref main`.
 - Never force-push `main`, never regenerate the signing key — installed extensions would stop
-  updating for every user of this repo. A local backup of the key exists in a folder outside
-  and next to the repo; locate it (ask the user) before any destructive key operation.
+  updating for every user of this repo. Backups of the key exist in a folder outside and next
+  to the repo and in the private repo `napatsakorn-kamkrua/erdachi-backup`; restore from a
+  backup instead of ever generating a new key.
 - If the source is still broken after a successful sync, only then fall back to hand-fixing:
   probe the failing endpoint with curl, diff against the template selectors, add the override,
   bump `versionCode`, push (see the `erdachi-add-source` skill).
