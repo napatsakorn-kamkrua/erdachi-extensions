@@ -5,6 +5,7 @@ import eu.kanade.tachiyomi.source.model.FilterList
 import eu.kanade.tachiyomi.source.model.MangasPage
 import eu.kanade.tachiyomi.source.model.SManga
 import keiyoushi.annotation.Source
+import keiyoushi.network.post
 import keiyoushi.utils.asJsoup
 import okhttp3.FormBody
 import org.jsoup.nodes.Element
