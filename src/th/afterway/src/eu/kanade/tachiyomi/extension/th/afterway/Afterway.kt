@@ -168,12 +168,10 @@ abstract class Afterway : KeiSource() {
 
 // ========================= CDN Helpers =========================
 
-private fun encodeCdn(path: String): String {
-    return Base64.encodeToString(
-        path.toByteArray(Charsets.UTF_8),
-        Base64.URL_SAFE or Base64.NO_WRAP or Base64.NO_PADDING,
-    )
-}
+private fun encodeCdn(path: String): String = Base64.encodeToString(
+    path.toByteArray(Charsets.UTF_8),
+    Base64.URL_SAFE or Base64.NO_WRAP or Base64.NO_PADDING,
+)
 
 // ========================= DTOs =========================
 
@@ -308,10 +306,11 @@ private fun parseStatus(status: String?): Int = when (status?.lowercase()) {
 
 // ========================= Filters =========================
 
-private class TypeFilter : Filter.Select<String>(
-    "Type",
-    arrayOf("Manga", "Novel", "Both"),
-) {
+private class TypeFilter :
+    Filter.Select<String>(
+        "Type",
+        arrayOf("Manga", "Novel", "Both"),
+    ) {
     val selected: String
         get() = when (state) {
             0 -> "manga"
@@ -320,10 +319,11 @@ private class TypeFilter : Filter.Select<String>(
         }
 }
 
-private class StatusFilter : Filter.Select<String>(
-    "Status",
-    arrayOf("All", "Ongoing", "Completed", "Hiatus", "Cancelled"),
-) {
+private class StatusFilter :
+    Filter.Select<String>(
+        "Status",
+        arrayOf("All", "Ongoing", "Completed", "Hiatus", "Cancelled"),
+    ) {
     val selected: String
         get() = when (state) {
             1 -> "ongoing"
@@ -334,34 +334,36 @@ private class StatusFilter : Filter.Select<String>(
         }
 }
 
-private class GenreFilter : Filter.Select<String>(
-    "Genre",
-    arrayOf(
-        "All",
-        "Action",
-        "Adventure",
-        "Comedy",
-        "Drama",
-        "Fantasy",
-        "Harem",
-        "Horror",
-        "Isekai",
-        "Romance",
-        "School",
-        "Sci-Fi",
-        "Sports",
-        "Superhero",
-    ),
-) {
+private class GenreFilter :
+    Filter.Select<String>(
+        "Genre",
+        arrayOf(
+            "All",
+            "Action",
+            "Adventure",
+            "Comedy",
+            "Drama",
+            "Fantasy",
+            "Harem",
+            "Horror",
+            "Isekai",
+            "Romance",
+            "School",
+            "Sci-Fi",
+            "Sports",
+            "Superhero",
+        ),
+    ) {
     val selected: String
         get() = if (state == 0) "all" else values[state]
 }
 
-private class SortFilter : Filter.Sort(
-    "Sort by",
-    arrayOf("Updated at", "Created at", "Views", "Favorites", "Title"),
-    Selection(0, false),
-) {
+private class SortFilter :
+    Filter.Sort(
+        "Sort by",
+        arrayOf("Updated at", "Created at", "Views", "Favorites", "Title"),
+        Selection(0, false),
+    ) {
     val selected: String
         get() = when (state?.index) {
             1 -> "createdAt"
