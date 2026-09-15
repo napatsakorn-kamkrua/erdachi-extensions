@@ -8,15 +8,23 @@ import keiyoushi.annotation.Source
 import keiyoushi.utils.asJsoup
 import okhttp3.FormBody
 import org.jsoup.nodes.Element
-import java.text.SimpleDateFormat
+import java.time.LocalDate
+import java.time.ZoneId
+import java.time.format.DateTimeFormatter
 import java.util.Locale
-import java.util.TimeZone
 
 @Source
 abstract class HaremManga : ZManga() {
     // Thai full month names on Gregorian years, e.g. "14 กันยายน 2026".
-    override val dateFormatter = SimpleDateFormat("d MMMM yyyy", Locale("th")).apply {
-        timeZone = TimeZone.getTimeZone("Asia/Bangkok")
+    override val dateFormatter = DateTimeFormatter.ofPattern("d MMMM yyyy", Locale("th"))
+
+    override fun parseDate(dateString: String): Long = try {
+        LocalDate.parse(dateString, dateFormatter)
+            .atStartOfDay(ZoneId.of("Asia/Bangkok"))
+            .toInstant()
+            .toEpochMilli()
+    } catch (_: Exception) {
+        0L
     }
 
     // The site's title= search returns an empty list server-side; its own
