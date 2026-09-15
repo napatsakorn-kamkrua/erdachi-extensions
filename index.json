@@ -8,6 +8,27 @@
   "extensionList": {
     "extensions": [
       {
+        "name": "Afterway",
+        "packageName": "eu.kanade.tachiyomi.extension.th.afterway",
+        "resources": {
+          "apkUrl": "https://github.com/napatsakorn-kamkrua/erdachi-extensions/releases/download/45e4a73/tachiyomi-th.afterway-v1.6.1.apk",
+          "iconUrl": "https://cdn.jsdelivr.net/gh/napatsakorn-kamkrua/erdachi-extensions@main/src/th/afterway/res/mipmap-xhdpi/ic_launcher.png",
+          "jarUrl": "https://github.com/napatsakorn-kamkrua/erdachi-extensions/releases/download/45e4a73/tachiyomi-th.afterway-v1.6.1.jar"
+        },
+        "extensionLib": "1.6",
+        "versionCode": "106001",
+        "versionName": "1.6.1",
+        "contentWarning": "CONTENT_WARNING_MIXED",
+        "sources": [
+          {
+            "id": "4832489041463397603",
+            "name": "Afterway",
+            "language": "th",
+            "homeUrl": "https://www.afterway.org"
+          }
+        ]
+      },
+      {
         "name": "BKKManga",
         "packageName": "eu.kanade.tachiyomi.extension.th.bkkmanga",
         "resources": {

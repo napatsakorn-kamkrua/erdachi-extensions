@@ -1,4 +1,14 @@
 {
+  "eu.kanade.tachiyomi.extension.th.afterway": {
+    "apk": {
+      "name": "tachiyomi-th.afterway-v1.6.1.apk",
+      "sha256": "463e88418ca8ee9d577adbff8199a19b1747ce0f46b77b630bac152c9677a36d"
+    },
+    "jar": {
+      "name": "tachiyomi-th.afterway-v1.6.1.jar",
+      "sha256": "bc137afaaf0c25537280b8e49e89ff9331ba6beadd4140faadb5fe77b611708a"
+    }
+  },
   "eu.kanade.tachiyomi.extension.th.bkkmanga": {
     "apk": {
       "name": "tachiyomi-th.bkkmanga-v1.6.56.apk",
