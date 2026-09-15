@@ -14,22 +14,13 @@ import keiyoushi.source.KeiSource
 import keiyoushi.utils.parseAs
 import keiyoushi.utils.tryParse
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.JsonElement
 import okhttp3.HttpUrl
 import okhttp3.HttpUrl.Companion.toHttpUrl
 import kotlin.time.Instant
 
 @Source
 abstract class Afterway : KeiSource() {
-
-    override val client = super.client.newBuilder()
-        .addInterceptor { chain ->
-            val request = chain.request().newBuilder()
-                .header("Referer", "$baseUrl/")
-                .header("Origin", baseUrl)
-                .build()
-            chain.proceed(request)
-        }
-        .build()
 
     // ========================= Popular / Latest =========================
 
@@ -103,7 +94,7 @@ abstract class Afterway : KeiSource() {
         return MangasPage(mangas, hasNextPage = mangas.size >= limit)
     }
 
-    override fun getFilterList(): FilterList = FilterList(
+    override fun getFilterList(data: JsonElement?): FilterList = FilterList(
         TypeFilter(),
         StatusFilter(),
         GenreFilter(),
