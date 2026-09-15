@@ -24,6 +24,7 @@ Sources maintained in this hub:
 
 | Source | Language | Site | Status | Version |
 |---|---|---|---|---|
+| Afterway | Thai | [afterway.org](https://www.afterway.org) | ✅ Working | 1.6.1 |
 | BKKManga | Thai | [bkkmanga.com](https://bkkmanga.com) | ✅ Working | 1.6.56 |
 | DoujinTH | Thai | [doujin-th.com](https://doujin-th.com) | ✅ Working | 1.6.1 |
 | HaremManga | Thai | [haremmanga.net](https://www.haremmanga.net) | ✅ Working | 1.6.6 |
