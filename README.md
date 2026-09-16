@@ -27,7 +27,7 @@ Sources maintained in this hub:
 | Afterway | Thai | [afterway.org](https://www.afterway.org) | ✅ Working | 1.6.1 |
 | BKKManga | Thai | [bkkmanga.com](https://bkkmanga.com) | ✅ Working | 1.6.56 |
 | DoujinTH | Thai | [doujin-th.com](https://doujin-th.com) | ✅ Working | 1.6.1 |
-| HaremManga | Thai | [haremmanga.net](https://www.haremmanga.net) | ✅ Working | 1.6.6 |
+| HaremManga | Thai | [haremmanga.net](https://www.haremmanga.net) | ✅ Working | 1.6.7 |
 | DoujinThai | Thai | [doujin-thai.com](https://doujin-thai.com) | ✅ Working | 1.6.1 |
 | HentaiThai | Thai | [hentaithai.net](https://hentaithai.net) | ✅ Working | 1.6.1 |
 | HxHAni | Thai | [hxhani.com](https://hxhani.com) | ✅ Working | 1.6.1 |

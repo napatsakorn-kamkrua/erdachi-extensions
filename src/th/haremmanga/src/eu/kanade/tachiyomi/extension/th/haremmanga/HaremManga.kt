@@ -5,6 +5,7 @@ import eu.kanade.tachiyomi.source.model.FilterList
 import eu.kanade.tachiyomi.source.model.MangasPage
 import eu.kanade.tachiyomi.source.model.SManga
 import keiyoushi.annotation.Source
+import keiyoushi.network.get
 import keiyoushi.network.post
 import keiyoushi.utils.asJsoup
 import okhttp3.FormBody
@@ -27,6 +28,26 @@ abstract class HaremManga : ZManga() {
     } catch (_: Exception) {
         0L
     }
+
+    override suspend fun getPopularManga(page: Int): MangasPage {
+        val document = client.get("$baseUrl/advance-search/${pagePathSegment(page)}?order=popular").asJsoup()
+        val mangas = document.select(popularMangaSelector()).map { element ->
+            popularMangaFromElement(element)
+        }
+        val hasNextPage = document.select(popularMangaNextPageSelector()).isNotEmpty()
+        return MangasPage(mangas, hasNextPage)
+    }
+
+    override suspend fun getLatestUpdates(page: Int): MangasPage {
+        val document = client.get("$baseUrl/advance-search/${pagePathSegment(page)}?order=update").asJsoup()
+        val mangas = document.select(latestUpdatesSelector()).map { element ->
+            latestUpdatesFromElement(element)
+        }
+        val hasNextPage = document.select(latestUpdatesNextPageSelector()).isNotEmpty()
+        return MangasPage(mangas, hasNextPage)
+    }
+
+    override val supportsFilterFetching get() = false
 
     // The site's title= search returns an empty list server-side; its own
     // live-search widget POSTs to admin-ajax instead. No result pagination.
