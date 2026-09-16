@@ -41,12 +41,12 @@
   },
   "eu.kanade.tachiyomi.extension.th.haremmanga": {
     "apk": {
-      "name": "tachiyomi-th.haremmanga-v1.6.6.apk",
-      "sha256": "917155c9bc71bd8f47c723af1379b94e74922cd424b77a7779a00c8fa1febc31"
+      "name": "tachiyomi-th.haremmanga-v1.6.7.apk",
+      "sha256": "526e5dfeea323ee72d070367c7c73eb3c70060dca441f3263988f2fa56872370"
     },
     "jar": {
-      "name": "tachiyomi-th.haremmanga-v1.6.6.jar",
-      "sha256": "0fc57d90c1b638d17cd389ab1c110a0bad3fcdb7ce1f315e826cce4c08a8a17f"
+      "name": "tachiyomi-th.haremmanga-v1.6.7.jar",
+      "sha256": "6050bacb4a84a56e710f16346c1c1fdfe1a8dcdba287d717a82e85c23880cb1c"
     }
   },
   "eu.kanade.tachiyomi.extension.th.hentaithai": {

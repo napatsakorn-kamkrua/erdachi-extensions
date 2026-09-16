@@ -95,13 +95,13 @@
         "name": "HaremManga",
         "packageName": "eu.kanade.tachiyomi.extension.th.haremmanga",
         "resources": {
-          "apkUrl": "https://github.com/napatsakorn-kamkrua/erdachi-extensions/releases/download/e5d3711/tachiyomi-th.haremmanga-v1.6.6.apk",
+          "apkUrl": "https://github.com/napatsakorn-kamkrua/erdachi-extensions/releases/download/0eafc4a/tachiyomi-th.haremmanga-v1.6.7.apk",
           "iconUrl": "https://cdn.jsdelivr.net/gh/napatsakorn-kamkrua/erdachi-extensions@main/src/th/haremmanga/res/mipmap-xhdpi/ic_launcher.png",
-          "jarUrl": "https://github.com/napatsakorn-kamkrua/erdachi-extensions/releases/download/e5d3711/tachiyomi-th.haremmanga-v1.6.6.jar"
+          "jarUrl": "https://github.com/napatsakorn-kamkrua/erdachi-extensions/releases/download/0eafc4a/tachiyomi-th.haremmanga-v1.6.7.jar"
         },
         "extensionLib": "1.6",
-        "versionCode": "106006",
-        "versionName": "1.6.6",
+        "versionCode": "106007",
+        "versionName": "1.6.7",
         "contentWarning": "CONTENT_WARNING_MIXED",
         "sources": [
           {
