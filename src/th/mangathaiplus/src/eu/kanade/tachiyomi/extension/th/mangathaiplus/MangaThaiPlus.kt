@@ -142,15 +142,21 @@ abstract class MangaThaiPlus : KeiSource() {
             val parsedTitle = h1.substringBefore("(").trim()
             val altTitle = if (h1.contains("(") && h1.contains(")")) {
                 h1.substringAfter("(").substringBeforeLast(")").trim()
-            } else null
+            } else {
+                null
+            }
 
             val byline = document.selectFirst("p.byline")?.text().orEmpty()
             val authorName = if (byline.contains("ผู้แต่ง")) {
                 byline.substringAfter("ผู้แต่ง").substringBefore("นักวาด").trim()
-            } else null
+            } else {
+                null
+            }
             val artistName = if (byline.contains("นักวาด")) {
                 byline.substringAfter("นักวาด").trim()
-            } else null
+            } else {
+                null
+            }
 
             val meta = document.selectFirst("p.meta")?.text().orEmpty()
             val mangaStatus = when {
@@ -202,7 +208,9 @@ abstract class MangaThaiPlus : KeiSource() {
                     val dateStr = timeElem?.attr("datetime")
                     val date = if (!dateStr.isNullOrBlank()) {
                         Instant.tryParse(dateStr)
-                    } else 0L
+                    } else {
+                        0L
+                    }
 
                     SChapter.create().apply {
                         setUrlWithoutDomain(element.absUrl("href"))
