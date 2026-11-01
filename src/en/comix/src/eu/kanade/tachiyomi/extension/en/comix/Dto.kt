@@ -4,6 +4,7 @@ import eu.kanade.tachiyomi.source.model.SChapter
 import eu.kanade.tachiyomi.source.model.SManga
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.put
 import java.math.BigDecimal
@@ -17,6 +18,9 @@ const val CHAPTER_OFFICIAL_MEMO = "official"
 const val CHAPTER_GROUP_ID_MEMO = "groupId"
 const val CHAPTER_LIST_DEDUPLICATED_MEMO = "chapterListDeduplicated"
 const val CHAPTER_LIST_BLACKLIST_MEMO = "chapterListBlacklist"
+const val CHAPTER_LIST_COMPLETE_MEMO = "chapterListComplete"
+const val CHAPTER_LIST_FETCHED_AT_MEMO = "chapterListFetchedAt"
+const val CHAPTER_DATA_VERSION_MEMO = "chapterDataVersion"
 
 @Serializable
 class Term(
@@ -29,7 +33,7 @@ class TagSearchResponse(
 )
 
 @Serializable
-class TagSearchHit(val id: Int)
+class TagSearchHit(val id: Int, val label: String)
 
 @Serializable
 class Manga(
@@ -59,7 +63,9 @@ class Manga(
     private val rank: Int = 0,
     private val year: Int? = null,
     private val originalLanguage: String? = null,
+    private val links: Map<String, String?>? = null,
     private val url: String? = null,
+    val chapterUpdatedAtFormatted: String? = null,
 ) {
     @Serializable
     class Poster(
@@ -124,8 +130,8 @@ class Manga(
             val actualAltTitles = altTitles.ifEmpty { altTitlesOld }
             if (altTitlesInDesc && actualAltTitles.isNotEmpty()) {
                 append("\n\n")
-                append("Alternative Names:\n")
-                append(actualAltTitles.joinToString("\n"))
+                append("**Alternative Names**:\n")
+                append(actualAltTitles.joinToString("\n") { "- $it" })
             }
 
             if (showExtraInfo) {
@@ -133,6 +139,13 @@ class Manga(
                 if (extras.isNotEmpty()) {
                     if (isNotEmpty()) append("\n\n")
                     append(extras.joinToString("\n"))
+                }
+
+                val trackerLinks = getTrackerLinks()
+                if (trackerLinks.isNotEmpty()) {
+                    if (isNotEmpty()) append("\n\n")
+                    append("**Trackers**:\n")
+                    append(trackerLinks.joinToString("\n") { "- $it" })
                 }
             }
 
@@ -163,14 +176,35 @@ class Manga(
     }
 
     private fun buildExtraInfo(): List<String> = buildList {
-        year?.takeIf { it > 0 }?.let { add("Year: $it") }
-        originalLanguage?.takeIf { it.isNotBlank() }?.let { add("Language: ${it.uppercase()}") }
+        year?.takeIf { it > 0 }?.let { add("**Year**: $it") }
+        originalLanguage?.takeIf { it.isNotBlank() }?.let { add("**Language**: ${it.uppercase()}") }
         contentRating.takeIf { it.isNotBlank() }?.let {
-            add("Content rating: ${it.replaceFirstChar(Char::uppercase)}")
+            add("**Content rating**: ${it.replaceFirstChar(Char::uppercase)}")
         }
-        rank.takeIf { it > 0 }?.let { add("Rank: #$it") }
-        ratedCount.takeIf { it > 0 }?.let { add("Rated by: $it") }
-        followsTotal.takeIf { it > 0 }?.let { add("Followed by: $it") }
+        rank.takeIf { it > 0 }?.let { add("**Rank**: #$it") }
+        ratedCount.takeIf { it > 0 }?.let { add("**Rated by**: $it") }
+        followsTotal.takeIf { it > 0 }?.let { add("**Followed by**: $it") }
+    }
+
+    private fun getTrackerLinks(): List<String> {
+        val linkMap = links ?: return emptyList()
+        val siteNames = listOf(
+            "al" to "AniList",
+            "mal" to "MyAnimeList",
+            "mu" to "MangaUpdates",
+            "md" to "MangaDex",
+            "mb" to "MangaBaka",
+        )
+        val knownLinks = siteNames.mapNotNull { (key, name) ->
+            val url = linkMap[key]?.takeIf { it.isNotBlank() } ?: return@mapNotNull null
+            "[$name]($url)"
+        }
+        val unknownLinks = linkMap.filterKeys { k -> siteNames.none { it.first == k } }
+            .mapNotNull { (key, url) ->
+                val validUrl = url?.takeIf { it.startsWith("http") } ?: return@mapNotNull null
+                "[${key.uppercase()}]($validUrl)"
+            }
+        return knownLinks + unknownLinks
     }
 
     // Tags are separate from the curated genres in the site's detail UI.
@@ -231,22 +265,12 @@ class SearchResponse(
 }
 
 @Serializable
-class ChapterDetailsResponse(
-    val result: Items,
-) {
-    @Serializable
-    class Items(
-        val items: List<Chapter> = emptyList(),
-        private val meta: Meta? = null,
-        private val pagination: Pagination? = null,
-    ) {
-        fun hasNextPage(): Boolean = when {
-            meta != null -> meta.page < meta.actualLastPage
-            pagination != null -> pagination.page < pagination.actualLastPage
-            else -> false
-        }
-    }
-}
+class ChapterList(
+    val chapters: List<Chapter>,
+    val complete: Boolean,
+    val error: String? = null,
+    val queries: JsonObject? = null,
+)
 
 @Serializable
 class Chapter(
@@ -264,10 +288,6 @@ class Chapter(
         val id: Int? = null,
         val name: String,
     )
-
-    companion object {
-        private val DATE_REGEX = Regex("""^(\d+)\s*(s|m|h|d|w|mo|mos|y|yr|yrs|min|mins|sec|secs|hr|hrs|day|days|week|weeks|month|months|year|years)$""")
-    }
 
     fun toSChapter(mangaSlug: String) = SChapter.create().apply {
         url = this@Chapter.url.indexOf("/title/").let { index ->
@@ -298,47 +318,37 @@ class Chapter(
             "Unknown"
         }
     }
-
-    private fun parseRelativeDate(dateStr: String): Long {
-        if (dateStr.isEmpty()) return 0L
-        val trimmed = dateStr.trim().lowercase().removeSuffix(" ago")
-        val match = DATE_REGEX.find(trimmed) ?: return 0L
-
-        val amount = match.groupValues[1].toIntOrNull() ?: return 0L
-        val unit = match.groupValues[2]
-
-        val calendar = Calendar.getInstance()
-        when (unit) {
-            "s", "sec", "secs" -> calendar.add(Calendar.SECOND, -amount)
-            "m", "min", "mins" -> calendar.add(Calendar.MINUTE, -amount)
-            "h", "hr", "hrs" -> calendar.add(Calendar.HOUR_OF_DAY, -amount)
-            "d", "day", "days" -> calendar.add(Calendar.DAY_OF_YEAR, -amount)
-            "w", "week", "weeks" -> calendar.add(Calendar.WEEK_OF_YEAR, -amount)
-            "mo", "mos", "month", "months" -> calendar.add(Calendar.MONTH, -amount)
-            "y", "yr", "yrs", "year", "years" -> calendar.add(Calendar.YEAR, -amount)
-        }
-        return calendar.timeInMillis
-    }
 }
 
+// One message from the reader page walk
 @Serializable
-class ChapterResponse(
-    val result: ChapterResult,
-) {
-    @Serializable
-    class ChapterResult(
-        val pages: Pages,
-    )
+class CaptureMessage(
+    val type: String,
+    val total: Int? = null,
+    val index: Int? = null,
+    val url: String? = null,
+)
 
-    @Serializable
-    class Pages(
-        val baseUrl: String,
-        val items: List<PageDto>,
-    )
+private val DATE_REGEX = Regex("""^(\d+)\s*(s|m|h|d|w|mo|mos|y|yr|yrs|min|mins|sec|secs|hr|hrs|day|days|week|weeks|month|months|year|years)$""")
 
-    @Serializable
-    class PageDto(
-        val url: String,
-        val s: Int = 0,
-    )
+// Relative site date ("2w ago"); with latest, the latest time the text can stand for
+fun parseRelativeDate(dateStr: String, latest: Boolean = false): Long {
+    if (dateStr.isEmpty()) return 0L
+    val trimmed = dateStr.trim().lowercase().removeSuffix(" ago")
+    val match = DATE_REGEX.find(trimmed) ?: return 0L
+
+    val amount = (match.groupValues[1].toIntOrNull() ?: return 0L) - if (latest) 1 else 0
+    val unit = match.groupValues[2]
+
+    val calendar = Calendar.getInstance()
+    when (unit) {
+        "s", "sec", "secs" -> calendar.add(Calendar.SECOND, -amount)
+        "m", "min", "mins" -> calendar.add(Calendar.MINUTE, -amount)
+        "h", "hr", "hrs" -> calendar.add(Calendar.HOUR_OF_DAY, -amount)
+        "d", "day", "days" -> calendar.add(Calendar.DAY_OF_YEAR, -amount)
+        "w", "week", "weeks" -> calendar.add(Calendar.WEEK_OF_YEAR, -amount)
+        "mo", "mos", "month", "months" -> calendar.add(Calendar.MONTH, -amount)
+        "y", "yr", "yrs", "year", "years" -> calendar.add(Calendar.YEAR, -amount)
+    }
+    return calendar.timeInMillis
 }

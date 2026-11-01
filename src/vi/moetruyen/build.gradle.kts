@@ -4,10 +4,15 @@ plugins {
     alias(kei.plugins.extension)
 }
 
+dependencies {
+    implementation(project(":lib:aessiv"))
+    implementation(project(":lib:ece"))
+}
+
 keiyoushi {
     name = "MoeTruyen"
-    versionCode = 11
-    contentWarning = ContentWarning.SAFE
+    versionCode = 21
+    contentWarning = ContentWarning.MIXED
     libVersion = "1.6"
 
     deeplink {

@@ -6,13 +6,13 @@ plugins {
 
 keiyoushi {
     name = "Komikindo"
-    versionCode = 7
+    versionCode = 10
     contentWarning = ContentWarning.NSFW
     libVersion = "1.6"
     theme = "mangathemesia"
 
     source {
         lang = "id"
-        baseUrl = "https://komikindo.fit"
+        baseUrl = "https://2.komikindo.shop"
     }
 }

@@ -6,13 +6,13 @@ import eu.kanade.tachiyomi.source.model.SChapter
 import eu.kanade.tachiyomi.source.model.SManga
 import eu.kanade.tachiyomi.source.model.SMangaUpdate
 import keiyoushi.annotation.Source
+import keiyoushi.network.Fetch
 import keiyoushi.network.post
 import keiyoushi.utils.asJsoup
+import keiyoushi.utils.textOrNull
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
-import okhttp3.MultipartBody
-import org.jsoup.nodes.Document
-import org.jsoup.nodes.Element
+import okhttp3.FormBody
 
 @Source
 abstract class AstralScans : MangaThemesia() {
@@ -31,77 +31,59 @@ abstract class AstralScans : MangaThemesia() {
     }
 
     private suspend fun getChapterList(manga: SManga): List<SChapter> {
-        val body = MultipartBody.Builder()
-            .setType(MultipartBody.FORM)
-            .addFormDataPart("manga_req", "ping")
+        val body = FormBody.Builder()
+            .add("asx_req", "chapters")
             .build()
 
-        return chapterListParse(
-            client.post(
-                baseUrl + manga.url,
-                headers = headersBuilder()
-                    .add("X-Requested-With", "XMLHttpRequest")
-                    .build(),
-                body = body,
-            ).asJsoup(),
+        val headers = headersBuilder()
+            .add("X-Alt-Auth", "1")
+            .build()
+
+        val response = client.post(
+            getMangaUrl(manga),
+            headers,
+            Fetch.XHR.from(getMangaUrl(manga)),
+            body,
         )
+
+        val responseText = response.body.string()
+        return if (responseText.startsWith("ASX_")) {
+            parseChapters(responseText)
+        } else {
+            super.chapterListParse(responseText.asJsoup(baseUrl))
+        }
     }
 
-    override fun chapterListParse(document: Document): List<SChapter> {
-        val responseString = document.toString()
+    private fun parseChapters(responseText: String): List<SChapter> {
+        val payload = rot13(responseText.removePrefix("ASX_"))
+        val decoded = String(Base64.decode(payload, Base64.DEFAULT), Charsets.UTF_8).reversed()
+        val parts = decoded.split("|||")
+        if (parts.size < 2) return emptyList()
 
-        if (responseString.startsWith("ASTRAL_")) {
-            val parts = responseString.split("|||")
+        val dynamicDataAttr = parts[1]
+        return parts[0].asJsoup(baseUrl).select("[$dynamicDataAttr]").mapNotNull { element ->
+            val chapterUrl = String(Base64.decode(element.attr(dynamicDataAttr), Base64.DEFAULT), Charsets.UTF_8)
 
-            if (parts.size >= 3) {
-                try {
-                    val rawHtml = String(Base64.decode(parts[1], Base64.DEFAULT), Charsets.UTF_8)
-                    val dynamicDataAttr = parts[2]
+            // Decoy entries point at a protect page and are hidden by the site's own CSS
+            if (chapterUrl.contains("/?protect=")) {
+                return@mapNotNull null
+            }
 
-                    val chapters = rawHtml.asJsoup(baseUrl).select("[$dynamicDataAttr]").mapNotNull { element ->
-                        val isTrap = element.hasClass("trap") ||
-                            element.attr("class").contains("trap") ||
-                            element.closest("[class*=trap]") != null
-
-                        if (isTrap) {
-                            return@mapNotNull null
-                        }
-
-                        SChapter.create().apply {
-                            val encodedUrl = element.attr(dynamicDataAttr)
-                            val chapterUrl = String(Base64.decode(encodedUrl, Base64.DEFAULT), Charsets.UTF_8)
-                            setUrlWithoutDomain(chapterUrl)
-
-                            name = element.selectFirst("span[class^=n_]")?.text() ?: "Chapter"
-                            date_upload = element.selectFirst("span[class^=d_]")?.text()?.parseChapterDate() ?: 0L
-                        }
-                    }
-
-                    if (chapters.isNotEmpty()) {
-                        return chapters
-                    }
-                } catch (_: Exception) {}
+            // The first span is a hidden "Read"/"Info" label for the site's own chapter search
+            val spans = element.select("span")
+            SChapter.create().apply {
+                setUrlWithoutDomain(chapterUrl)
+                name = spans.getOrNull(1)?.textOrNull() ?: "Chapter"
+                date_upload = spans.getOrNull(2)?.textOrNull()?.parseChapterDate() ?: 0L
             }
         }
-
-        // Fallback: If site reverts to standard MangaThemesia DOM elements
-        return super.chapterListParse(document)
     }
 
-    override fun chapterListSelector() = "div#kumpulan-bab-area .astral-item, div.eplister li"
-
-    override fun chapterFromElement(element: Element): SChapter = SChapter.create().apply {
-        val urlElement = element.selectFirst("a")
-        val dataU = element.selectFirst(".js-link")?.attr("data-u") ?: ""
-
-        if (dataU.isNotEmpty()) {
-            val decoded = String(Base64.decode(dataU, Base64.DEFAULT), Charsets.UTF_8)
-            setUrlWithoutDomain(decoded)
-        } else {
-            setUrlWithoutDomain(urlElement?.attr("href") ?: "")
+    private fun rot13(text: String) = text.map {
+        when (it) {
+            in 'a'..'m', in 'A'..'M' -> it + 13
+            in 'n'..'z', in 'N'..'Z' -> it - 13
+            else -> it
         }
-
-        name = element.selectFirst(".ch-title, .epl-num, .chapternum")?.text() ?: ""
-        date_upload = element.selectFirst(".ch-date, .chapterdate")?.text()?.parseChapterDate() ?: 0L
-    }
+    }.joinToString("")
 }

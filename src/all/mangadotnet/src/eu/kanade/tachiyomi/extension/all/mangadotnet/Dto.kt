@@ -78,7 +78,7 @@ class BrowseManga(
         title = this@BrowseManga.title
 
         thumbnail_url = if (isAdult && hideAdultCovers) {
-            "https://fakeimg.ryd.tools/400x600/?text=NSFW"
+            "https://fakeimg.cnbattle.com/400x600/?text=NSFW"
         } else {
             photo?.let {
                 if (it.startsWith("/")) {
@@ -116,12 +116,14 @@ class MangaData(
     @Serializable
     class Data(
         val manga: Manga,
+        @SerialName("total_volumes")
+        val volumeCount: Int? = null,
     )
 }
 
 @Serializable
 class RelatedData(
-    val suggestions: List<BrowseManga> = emptyList(),
+    val suggestions: List<BrowseManga>? = null,
     val relationsData: RelationsData? = null,
 ) {
     @Serializable
@@ -148,7 +150,6 @@ class Manga(
     private val tags: List<TagCategory> = emptyList(),
     private val description: String? = null,
     private val photo: String? = null,
-    private val hiatus: String? = null,
     private val status: String? = null,
     @SerialName("source_url")
     private val sourceUrl: String? = null,
@@ -194,7 +195,7 @@ class Manga(
         private val listRegex = Regex("\n\n(-|•|\\d+\\.)")
     }
 
-    fun toSManga(baseUrl: String, showTags: Boolean = true) = SManga.create().apply {
+    fun toSManga(baseUrl: String, showTags: Boolean = true, extraVolumeCount: Int? = null) = SManga.create().apply {
         url = id.toString()
         title = this@Manga.title
         thumbnail_url = photo?.let {
@@ -228,11 +229,11 @@ class Manga(
             }
         }.joinToString()
         status = when {
-            "One Shot" in this@Manga.genres -> SManga.COMPLETED
-            this@Manga.hiatus == "Yes" -> SManga.ON_HIATUS
             else -> when (this@Manga.status?.lowercase()) {
                 "ongoing" -> SManga.ONGOING
                 "completed" -> SManga.COMPLETED
+                "hiatus" -> SManga.ON_HIATUS
+                "cancelled" -> SManga.CANCELLED
                 else -> SManga.UNKNOWN
             }
         }
@@ -246,6 +247,7 @@ class Manga(
             val metaInfo = buildList {
                 year?.let { add("**Year:** $it") }
                 chapterCount?.let { add("**Chapters:** $it") }
+                extraVolumeCount?.let { add("**Volumes:** $it") }
                 trackedCount?.let { add("**Tracked:** $it") }
                 contentRating?.let {
                     add("**Content Rating:** ${it.replaceFirstChar { c -> c.uppercase() }}")
@@ -302,6 +304,12 @@ class Manga(
 }
 
 @Serializable
+class Group(
+    val id: Int,
+    val name: String,
+)
+
+@Serializable
 class Chapter(
     val id: Int,
     @SerialName("chapter_number")
@@ -323,13 +331,7 @@ class Chapter(
     val pageCount: Int? = null,
     val source: String = "user",
     val groups: List<Group> = emptyList(),
-) {
-    @Serializable
-    class Group(
-        val id: Int,
-        val name: String,
-    )
-}
+)
 
 @Serializable
 class Volume(
@@ -344,6 +346,7 @@ class Volume(
     val date: String? = null,
     val source: String = "user",
     val language: String? = null,
+    val groups: List<Group> = emptyList(),
 )
 
 @Serializable
