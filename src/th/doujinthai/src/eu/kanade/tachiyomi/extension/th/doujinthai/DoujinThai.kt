@@ -55,7 +55,7 @@ abstract class DoujinThai : KeiSource() {
             val topicId = topicIdRegex.find(link.absUrl("href"))?.groupValues?.get(1) ?: return@mapNotNull null
 
             SManga.create().apply {
-                this.url = "/t$topicId"
+                this.url = topicPath(topicId)
                 title = link.text().trim()
                 thumbnail_url = card.selectFirst(".pic_img img")?.attr("abs:src")
             }
@@ -68,7 +68,7 @@ abstract class DoujinThai : KeiSource() {
 
     // The site's own search is a JavaScript-only Google CSE widget (the SMF
     // search requires login), so search runs through DuckDuckGo's HTML endpoint
-    // and keeps results that point at forum topics (1:1 with /t<id> pages).
+    // and keeps results that point at forum topics.
     override suspend fun getSearchMangaList(page: Int, query: String, filters: FilterList): MangasPage {
         if (query.isBlank()) return getPopularManga(page)
 
@@ -86,7 +86,7 @@ abstract class DoujinThai : KeiSource() {
 
                 topicIdRegex.find(link)?.groupValues?.get(1)?.let { topicId ->
                     SManga.create().apply {
-                        this.url = "/t$topicId"
+                        this.url = topicPath(topicId)
                         title = element.text().substringBefore(" - [").substringBefore(" | [").trim()
                     }
                 }
@@ -99,6 +99,8 @@ abstract class DoujinThai : KeiSource() {
 
     override suspend fun getMangaByUrl(url: HttpUrl): SManga? {
         val path = url.encodedPath
+        // Older entries and the site's pretty links use /t<id>, which is a less
+        // reliable alias than the plain SMF topic URL.
         val topicId = when {
             path.startsWith("/t") && path.drop(2).toIntOrNull() != null -> path.drop(2)
             else -> url.queryParameter("topic")
@@ -106,7 +108,7 @@ abstract class DoujinThai : KeiSource() {
                 ?.takeIf { it.toIntOrNull() != null }
         } ?: return null
 
-        val manga = SManga.create().apply { this.url = "/t$topicId" }
+        val manga = SManga.create().apply { this.url = topicPath(topicId) }
         return fetchMangaUpdate(manga, emptyList(), fetchDetails = true, fetchChapters = false)
             .manga
             .apply { this.url = manga.url }
@@ -165,6 +167,8 @@ abstract class DoujinThai : KeiSource() {
         .map { it.attr("abs:src") }
         .filter { pageImageRegex.containsMatchIn(it) }
 }
+
+private fun topicPath(topicId: String) = "/forum/index.php?topic=$topicId.0"
 
 private val topicIdRegex = Regex("""topic=(\d+)""")
 private val boardStartRegex = Regex("""board=1\.(\d+)""")

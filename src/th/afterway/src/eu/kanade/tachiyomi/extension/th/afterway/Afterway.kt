@@ -9,6 +9,7 @@ import eu.kanade.tachiyomi.source.model.SChapter
 import eu.kanade.tachiyomi.source.model.SManga
 import eu.kanade.tachiyomi.source.model.SMangaUpdate
 import keiyoushi.annotation.Source
+import keiyoushi.network.Fetch
 import keiyoushi.network.get
 import keiyoushi.source.KeiSource
 import keiyoushi.utils.parseAs
@@ -28,7 +29,7 @@ abstract class Afterway : KeiSource() {
         val limit = 20
         val skip = (page - 1) * limit
         val url = baseUrl.toHttpUrl().newBuilder()
-            .addPathSegments("api/series")
+            .addPathSegments("api/project")
             .addQueryParameter("type", "manga")
             .addQueryParameter("sort", "views")
             .addQueryParameter("order", "desc")
@@ -36,16 +37,16 @@ abstract class Afterway : KeiSource() {
             .addQueryParameter("skip", skip.toString())
             .build()
 
-        val response = client.get(url).parseAs<SeriesListResponse>()
+        val response = client.get(url, Fetch.XHR).parseAs<ProjectListResponse>()
         val mangas = response.data.map { it.toSManga(baseUrl) }
-        return MangasPage(mangas, hasNextPage = mangas.size >= limit)
+        return MangasPage(mangas, response.pagination?.hasMore ?: (mangas.size >= limit))
     }
 
     override suspend fun getLatestUpdates(page: Int): MangasPage {
         val limit = 20
         val skip = (page - 1) * limit
         val url = baseUrl.toHttpUrl().newBuilder()
-            .addPathSegments("api/series")
+            .addPathSegments("api/project")
             .addQueryParameter("type", "manga")
             .addQueryParameter("sort", "updatedAt")
             .addQueryParameter("order", "desc")
@@ -53,9 +54,9 @@ abstract class Afterway : KeiSource() {
             .addQueryParameter("skip", skip.toString())
             .build()
 
-        val response = client.get(url).parseAs<SeriesListResponse>()
+        val response = client.get(url, Fetch.XHR).parseAs<ProjectListResponse>()
         val mangas = response.data.map { it.toSManga(baseUrl) }
-        return MangasPage(mangas, hasNextPage = mangas.size >= limit)
+        return MangasPage(mangas, response.pagination?.hasMore ?: (mangas.size >= limit))
     }
 
     // ========================= Search =========================
@@ -64,7 +65,7 @@ abstract class Afterway : KeiSource() {
         val limit = 20
         val skip = (page - 1) * limit
         val url = baseUrl.toHttpUrl().newBuilder()
-            .addPathSegments("api/series")
+            .addPathSegments("api/project")
             .addQueryParameter("limit", limit.toString())
             .addQueryParameter("skip", skip.toString())
 
@@ -89,9 +90,9 @@ abstract class Afterway : KeiSource() {
             url.addQueryParameter("type", type)
         }
 
-        val response = client.get(url.build()).parseAs<SeriesListResponse>()
+        val response = client.get(url.build(), Fetch.XHR).parseAs<ProjectListResponse>()
         val mangas = response.data.map { it.toSManga(baseUrl) }
-        return MangasPage(mangas, hasNextPage = mangas.size >= limit)
+        return MangasPage(mangas, response.pagination?.hasMore ?: (mangas.size >= limit))
     }
 
     override fun getFilterList(data: JsonElement?): FilterList = FilterList(
@@ -110,22 +111,14 @@ abstract class Afterway : KeiSource() {
         fetchChapters: Boolean,
     ): SMangaUpdate {
         val projectId = manga.url.removePrefix("/project/").substringBefore("/")
-        val response = client.get("$baseUrl/api/project/$projectId").parseAs<ProjectDetailsResponse>()
-        val project = response.data ?: throw Exception("Project not found")
-
-        val sManga = if (fetchDetails) {
-            project.toSManga(baseUrl)
+        val project = if (fetchDetails) {
+            client.get("$baseUrl/api/project/$projectId", Fetch.XHR).parseAs<ProjectResponse>().data
+                ?: throw Exception("Project not found")
         } else {
-            manga
+            null
         }
-
-        val sChapters = if (fetchChapters) {
-            project.chapters.map { it.toSChapter(projectId) }
-        } else {
-            chapters
-        }
-
-        return SMangaUpdate(sManga, sChapters)
+        val chapterList = if (fetchChapters) fetchChapters(projectId) else chapters
+        return SMangaUpdate(project?.toSManga(baseUrl) ?: manga, chapterList)
     }
 
     override suspend fun getMangaByUrl(url: HttpUrl): SManga? {
@@ -144,17 +137,33 @@ abstract class Afterway : KeiSource() {
 
     override suspend fun getPageList(chapter: SChapter): List<Page> {
         val chapterId = chapter.url.substringAfterLast("/").substringBefore("?")
-        val response = client.get("$baseUrl/api/chapters/$chapterId").parseAs<ChapterDetailsResponse>()
+        val response = client.get("$baseUrl/api/chapters/$chapterId", Fetch.XHR).parseAs<ChapterResponse>()
         val chapterData = response.data ?: throw Exception("Chapter not found")
-        val pages = chapterData.pages ?: emptyList()
+        val pages = chapterData.pages
 
-        return pages.mapIndexed { index, page ->
-            val extension = page.extension ?: "webp"
-            val encodedFileName = encodeCdn("${page.id}.$extension")
-            val folder = page.folder ?: "pages/${chapterData.projectId ?: ""}/${chapterData.id}"
-            Page(index, imageUrl = "$baseUrl/cdn/$folder/$encodedFileName.html")
+        return pages.sortedBy(PageItem::pageNumber).mapIndexed { index, page ->
+            Page(index, imageUrl = page.imageUrl(baseUrl))
         }
     }
+}
+
+private suspend fun Afterway.fetchChapters(projectId: String): List<SChapter> {
+    val result = mutableListOf<SChapter>()
+    var page = 1
+    do {
+        val url = baseUrl.toHttpUrl().newBuilder()
+            .addPathSegments("api/chapters")
+            .addQueryParameter("projectId", projectId)
+            .addQueryParameter("sort", "number")
+            .addQueryParameter("order", "desc")
+            .addQueryParameter("page", page.toString())
+            .addQueryParameter("limit", "100")
+            .build()
+        val response = client.get(url, Fetch.XHR).parseAs<ChapterListResponse>()
+        result += response.data.map { it.toSChapter(projectId) }
+        page++
+    } while (response.pagination?.let { it.page < it.totalPages } == true)
+    return result
 }
 
 // ========================= CDN Helpers =========================
@@ -167,12 +176,25 @@ private fun encodeCdn(path: String): String = Base64.encodeToString(
 // ========================= DTOs =========================
 
 @Serializable
-private class SeriesListResponse(
-    val data: List<SeriesItem> = emptyList(),
+private class ProjectListResponse(
+    val data: List<ProjectItem> = emptyList(),
+    val pagination: Pagination? = null,
 )
 
 @Serializable
-private class SeriesItem(
+private class Pagination(
+    val page: Int = 1,
+    val totalPages: Int = 1,
+    val hasMore: Boolean? = null,
+)
+
+@Serializable
+private class ProjectResponse(
+    val data: ProjectItem? = null,
+)
+
+@Serializable
+private class ProjectItem(
     val id: String,
     val title: String,
     val coverId: String? = null,
@@ -182,62 +204,23 @@ private class SeriesItem(
     val artist: String? = null,
     val genres: List<String> = emptyList(),
     val status: String? = null,
-) {
-    fun toSManga(baseUrl: String): SManga = SManga.create().apply {
-        url = "/project/$id"
-        title = this@SeriesItem.title
-        coverId?.let { cid ->
-            val ext = coverExt ?: "webp"
-            val encoded = encodeCdn("$cid.$ext")
-            thumbnail_url = "$baseUrl/cdn/covers/$encoded.html"
-        }
-        author = this@SeriesItem.author
-        artist = this@SeriesItem.artist
-        description = this@SeriesItem.description
-        genre = genres.joinToString()
-        status = parseStatus(this@SeriesItem.status)
-    }
-}
-
-@Serializable
-private class ProjectDetailsResponse(
-    val data: ProjectDetails? = null,
-)
-
-@Serializable
-private class ProjectDetails(
-    val id: String,
-    val title: String,
-    val alternativeTitles: List<String> = emptyList(),
-    val coverId: String? = null,
-    val coverExt: String? = null,
-    val description: String? = null,
-    val author: String? = null,
-    val artist: String? = null,
-    val genres: List<String> = emptyList(),
-    val status: String? = null,
+    val isOriginal: Boolean? = null,
+    val isNSFW: Boolean? = null,
     val chapters: List<ChapterItem> = emptyList(),
 ) {
     fun toSManga(baseUrl: String): SManga = SManga.create().apply {
         url = "/project/$id"
-        title = this@ProjectDetails.title
+        title = this@ProjectItem.title
         coverId?.let { cid ->
             val ext = coverExt ?: "webp"
             val encoded = encodeCdn("$cid.$ext")
             thumbnail_url = "$baseUrl/cdn/covers/$encoded.html"
         }
-        author = this@ProjectDetails.author
-        artist = this@ProjectDetails.artist
-
-        val desc = buildString {
-            this@ProjectDetails.description?.let { append(it).append("\n\n") }
-            if (alternativeTitles.isNotEmpty()) {
-                append("Alternative Titles: ").append(alternativeTitles.joinToString()).append("\n")
-            }
-        }.trim()
-        description = desc.ifEmpty { null }
+        author = this@ProjectItem.author
+        artist = this@ProjectItem.artist
+        description = this@ProjectItem.description
         genre = genres.joinToString()
-        status = parseStatus(this@ProjectDetails.status)
+        status = parseStatus(this@ProjectItem.status)
     }
 }
 
@@ -268,24 +251,41 @@ private class ChapterItem(
 }
 
 @Serializable
-private class ChapterDetailsResponse(
-    val data: ChapterDetails? = null,
+private class ChapterListResponse(
+    val data: List<ChapterItem> = emptyList(),
+    val pagination: ChapterPagination? = null,
 )
 
 @Serializable
-private class ChapterDetails(
+private class ChapterPagination(
+    val page: Int,
+    val totalPages: Int,
+)
+
+@Serializable
+private class ChapterResponse(
+    val data: ChapterData? = null,
+)
+
+@Serializable
+private class ChapterData(
     val id: String,
-    val projectId: String? = null,
-    val pages: List<PageItem>? = null,
+    val projectId: String,
+    val pages: List<PageItem> = emptyList(),
 )
 
 @Serializable
 private class PageItem(
     val id: String,
-    val pageNumber: Int? = null,
-    val extension: String? = null,
-    val folder: String? = null,
-)
+    val pageNumber: Int,
+    val extension: String,
+    val folder: String,
+) {
+    fun imageUrl(baseUrl: String): String {
+        val encodedFileName = encodeCdn("$id.$extension")
+        return "$baseUrl/cdn/$folder/$encodedFileName.html"
+    }
+}
 
 private fun parseStatus(status: String?): Int = when (status?.lowercase()) {
     "ongoing" -> SManga.ONGOING
