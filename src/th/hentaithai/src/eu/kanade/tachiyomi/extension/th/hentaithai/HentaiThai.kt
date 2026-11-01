@@ -8,6 +8,7 @@ import eu.kanade.tachiyomi.source.model.SManga
 import eu.kanade.tachiyomi.source.model.SMangaUpdate
 import eu.kanade.tachiyomi.source.model.UpdateStrategy
 import keiyoushi.annotation.Source
+import keiyoushi.network.Fetch
 import keiyoushi.network.get
 import keiyoushi.source.KeiSource
 import keiyoushi.utils.asJsoup
@@ -47,7 +48,7 @@ abstract class HentaiThai : KeiSource() {
         setMaxPage: (Int) -> Unit,
     ): MangasPage {
         if (page == 1 || maxPage() == 0) {
-            val document = client.get("$baseUrl/$path-$CLAMP_PAGE").asJsoup()
+            val document = client.get("$baseUrl/$path-$CLAMP_PAGE", Fetch.DOCUMENT).asJsoup()
             setMaxPage(document.currentMaxPage())
             if (page == 1) {
                 return parseMangasPage(document, hasNextPage = maxPage() > 1)
@@ -57,7 +58,7 @@ abstract class HentaiThai : KeiSource() {
         val sitePage = maxPage() - (page - 1)
         if (sitePage < 1) return MangasPage(emptyList(), false)
 
-        val document = client.get("$baseUrl/$path-$sitePage").asJsoup()
+        val document = client.get("$baseUrl/$path-$sitePage", Fetch.DOCUMENT).asJsoup()
         return parseMangasPage(document, hasNextPage = sitePage > 1)
     }
 
@@ -101,7 +102,7 @@ abstract class HentaiThai : KeiSource() {
             .addQueryParameter("s", (10 * (page - 1)).toString())
             .build()
 
-        val document = client.get(searchUrl).asJsoup()
+        val document = client.get(searchUrl, Fetch.DOCUMENT).asJsoup()
         val mangas = document.select("a.result__a")
             .mapNotNull { element ->
                 val link = element.absUrl("href").let { href ->
@@ -144,7 +145,7 @@ abstract class HentaiThai : KeiSource() {
         fetchDetails: Boolean,
         fetchChapters: Boolean,
     ): SMangaUpdate {
-        val document = client.get(getMangaUrl(manga)).asJsoup()
+        val document = client.get(getMangaUrl(manga), Fetch.DOCUMENT).asJsoup()
         return SMangaUpdate(parseMangaDetails(document), parseChapterList(document))
     }
 
@@ -193,7 +194,7 @@ abstract class HentaiThai : KeiSource() {
     // ========================= Pages =========================
 
     override suspend fun getPageList(chapter: SChapter): List<Page> {
-        val document = client.get(getChapterUrl(chapter)).asJsoup()
+        val document = client.get(getChapterUrl(chapter), Fetch.DOCUMENT).asJsoup()
         val pages = pageImageUrls(document).mapIndexed { index, imageUrl -> Page(index, imageUrl = imageUrl) }
         if (pages.isEmpty()) throw Exception("No pages found")
         return pages
