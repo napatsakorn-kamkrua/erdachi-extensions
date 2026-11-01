@@ -7,6 +7,7 @@ import eu.kanade.tachiyomi.source.model.SChapter
 import eu.kanade.tachiyomi.source.model.SManga
 import eu.kanade.tachiyomi.source.model.SMangaUpdate
 import keiyoushi.annotation.Source
+import keiyoushi.network.Fetch
 import keiyoushi.network.get
 import keiyoushi.source.KeiSource
 import keiyoushi.utils.asJsoup
@@ -26,7 +27,7 @@ abstract class MangaThaiPlus : KeiSource() {
 
     override suspend fun getPopularManga(page: Int): MangasPage {
         val path = if (page > 1) "series/page/$page/" else "series/"
-        val document = client.get("$baseUrl/$path").asJsoup()
+        val document = client.get("$baseUrl/$path", Fetch.DOCUMENT).asJsoup()
         val mangas = document.select("article.card").mapNotNull { parseCard(it) }
         val hasNextPage = document.select("nav.pagination a")
             .any { it.text().contains("ถัดไป") || it.attr("href").contains("/page/${page + 1}/") }
@@ -35,7 +36,7 @@ abstract class MangaThaiPlus : KeiSource() {
 
     override suspend fun getLatestUpdates(page: Int): MangasPage {
         if (page > 1) return MangasPage(emptyList(), false)
-        val document = client.get("$baseUrl/updates/").asJsoup()
+        val document = client.get("$baseUrl/updates/", Fetch.DOCUMENT).asJsoup()
         val mangas = document.select("article.card").mapNotNull { parseCard(it) }
         return MangasPage(mangas, false)
     }
@@ -67,7 +68,7 @@ abstract class MangaThaiPlus : KeiSource() {
         }
 
         if (cachedDocs == null) {
-            val response = client.get("$baseUrl/search-index.json").parseAs<SearchIndexDto>()
+            val response = client.get("$baseUrl/search-index.json", Fetch.XHR).parseAs<SearchIndexDto>()
             cachedDocs = response.docs
         }
         val docs = cachedDocs ?: emptyList()
@@ -135,7 +136,7 @@ abstract class MangaThaiPlus : KeiSource() {
         fetchDetails: Boolean,
         fetchChapters: Boolean,
     ): SMangaUpdate {
-        val document = client.get(baseUrl + manga.url).asJsoup()
+        val document = client.get(baseUrl + manga.url, Fetch.DOCUMENT).asJsoup()
 
         val sManga = if (fetchDetails) {
             val h1 = document.selectFirst("h1")?.text().orEmpty()
@@ -241,7 +242,7 @@ abstract class MangaThaiPlus : KeiSource() {
     // ========================= Pages =========================
 
     override suspend fun getPageList(chapter: SChapter): List<Page> {
-        val document = client.get(baseUrl + chapter.url).asJsoup()
+        val document = client.get(baseUrl + chapter.url, Fetch.DOCUMENT).asJsoup()
         val pageUrls = mutableListOf<String>()
 
         // 1. Static images in HTML (first few pages)
