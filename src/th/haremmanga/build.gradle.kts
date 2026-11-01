@@ -7,7 +7,7 @@ plugins {
 keiyoushi {
     name = "HaremManga"
     theme = "zmanga"
-    versionCode = 3
+    versionCode = 4
     contentWarning = ContentWarning.MIXED
     libVersion = "1.6"
 
