@@ -8,6 +8,7 @@ import eu.kanade.tachiyomi.source.model.SManga
 import eu.kanade.tachiyomi.source.model.SMangaUpdate
 import eu.kanade.tachiyomi.source.model.UpdateStrategy
 import keiyoushi.annotation.Source
+import keiyoushi.network.Fetch
 import keiyoushi.network.get
 import keiyoushi.source.KeiSource
 import keiyoushi.utils.asJsoup
@@ -30,14 +31,14 @@ abstract class HxHAni : KeiSource() {
 
     override suspend fun getLatestUpdates(page: Int): MangasPage {
         val url = if (page == 1) "$baseUrl/doujin-thai" else "$baseUrl/doujin-thai?pages=$page"
-        val document = client.get(url).asJsoup()
+        val document = client.get(url, Fetch.DOCUMENT).asJsoup()
         return parseMangasPage(document, hasNextPage = document.hasNextPages(page))
     }
 
     // Curated top-10 page: horizontal cards ("อันดับที่ N: <title>"); a single
     // unpaginated listing.
     override suspend fun getPopularManga(page: Int): MangasPage {
-        val document = client.get("$baseUrl/top-10-doujin").asJsoup()
+        val document = client.get("$baseUrl/top-10-doujin", Fetch.DOCUMENT).asJsoup()
         val mangas = document.select("div.card").mapNotNull { card ->
             val link = card.selectFirst("a[href*=doujin-]") ?: return@mapNotNull null
             val title = card.selectFirst("h5.card-title")?.text()
@@ -84,7 +85,7 @@ abstract class HxHAni : KeiSource() {
             .apply { if (page > 1) addQueryParameter("pages", page.toString()) }
             .build()
 
-        val document = client.get(searchUrl).asJsoup()
+        val document = client.get(searchUrl, Fetch.DOCUMENT).asJsoup()
         return parseMangasPage(document, hasNextPage = document.hasNextPages(page))
     }
 
@@ -106,7 +107,7 @@ abstract class HxHAni : KeiSource() {
         fetchDetails: Boolean,
         fetchChapters: Boolean,
     ): SMangaUpdate {
-        val document = client.get(getMangaUrl(manga)).asJsoup()
+        val document = client.get(getMangaUrl(manga), Fetch.DOCUMENT).asJsoup()
         val meta = document.selectFirst("script[type=application/ld+json]")?.data()?.parseAs<DoujinMeta>()
         return SMangaUpdate(parseMangaDetails(document, meta), parseChapterList(document, meta))
     }
@@ -139,7 +140,7 @@ abstract class HxHAni : KeiSource() {
     // ========================= Pages =========================
 
     override suspend fun getPageList(chapter: SChapter): List<Page> {
-        val document = client.get(getChapterUrl(chapter)).asJsoup()
+        val document = client.get(getChapterUrl(chapter), Fetch.DOCUMENT).asJsoup()
         val pages = pageImageUrls(document).mapIndexed { index, imageUrl -> Page(index, imageUrl = imageUrl) }
         if (pages.isEmpty()) throw Exception("No pages found")
         return pages

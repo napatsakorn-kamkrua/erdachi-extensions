@@ -17,6 +17,7 @@
 - **DoujinThai**: that CI run then revealed its four forum/search document requests also needed explicit `Fetch.DOCUMENT`. Fixed and bumped `versionCode` 2 → 3.
 - **HaremManga**: the next CI run found three more stale network calls (two document GETs and one AJAX POST). Added `Fetch.DOCUMENT`/`Fetch.XHR`; bumped `versionCode` 3 → 4.
 - **HentaiThai**: the following CI run found five more stale document GETs. Added `Fetch.DOCUMENT` and bumped `versionCode` 1 → 2.
+- **HxHAni**: CI after that surfaced five more stale document GETs. Added `Fetch.DOCUMENT`, bumped `versionCode` 1 → 2.
 
 ## README
 
@@ -32,7 +33,7 @@
   ```
 
 - Inspect/fix any compile or lint failures, then review `git diff` and `git status`.
-- Post-sync CI exposed stale network calls from the new required Fetch API across multiple Thai sources. MangaThaiPlus, DoujinTH, DoujinThai, and HaremManga fixes are pushed; HentaiThai is now fixed locally and needs a push/CI run. CI has not reached repository publishing since the upstream merge.
+- Post-sync CI exposed stale network calls from the new required Fetch API across multiple Thai sources. MangaThaiPlus, DoujinTH, DoujinThai, HaremManga, and HentaiThai fixes are pushed; HxHAni is now fixed locally and needs a push/CI run. CI has not reached repository publishing since the upstream merge.
 - The Afterway endpoint migration needs an in-app check, especially Cloudflare challenge handling and images. If the app still gets blocked, keep that limitation documented rather than adding an unverified bypass.
 - Commit source changes separately from the existing merge commit if appropriate; push only when ready. A push runs the repository build/publish workflow and expands the catalog due to the upstream sync.
 - `afterway/` contains untracked probe artifacts from prior investigation; preserve them unless the user asks otherwise.
