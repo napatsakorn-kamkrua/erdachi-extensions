@@ -18,7 +18,7 @@
 - **HaremManga**: the next CI run found three more stale network calls (two document GETs and one AJAX POST). Added `Fetch.DOCUMENT`/`Fetch.XHR`; bumped `versionCode` 3 → 4.
 - **HentaiThai**: the following CI run found five more stale document GETs. Added `Fetch.DOCUMENT` and bumped `versionCode` 1 → 2.
 - **HxHAni**: CI after that surfaced five more stale document GETs. Added `Fetch.DOCUMENT`, bumped `versionCode` 1 → 2.
-- **Publish workflow**: all extension builds passed in CI run `41334250259`, but publishing failed because the runner's system `protobuf` 4.21.12 lacks `runtime_version`, required by the generated `index_pb2.py`. Changed the workflow install to upgrade protobuf before publishing; this needs a new run to verify.
+- **Publish workflow**: all extension builds passed in CI run `41334250259`, but publishing failed because the runner's system `protobuf` 4.21.12 lacks `runtime_version`, required by the generated `index_pb2.py`. Changed the workflow install to upgrade protobuf before publishing. Full rebuild run `41471872523` then passed end to end and published the `repo` branch at `8a3abe1b9` with a 1.56 MB `index.json`.
 
 ## README
 
@@ -34,7 +34,7 @@
   ```
 
 - Inspect/fix any compile or lint failures, then review `git diff` and `git status`.
-- Post-sync CI exposed stale network calls from the new required Fetch API across multiple Thai sources; fixes are pushed. In run `41334250259`, all extension build chunks passed, but publishing failed due to the old runner protobuf package. The workflow now requests an upgrade and needs a new run. Afterway Cloudflare app behavior remains unverified. Local Android release lint remains blocked by missing SDK configuration.
+- Post-sync CI exposed stale network calls from the new required Fetch API across multiple Thai sources; fixes are pushed. Full rebuild run `41471872523` passed every extension chunk and the publish job, so the catalog is live on the `repo` branch. Afterway Cloudflare app behavior remains unverified. Local Android release lint remains blocked by missing SDK configuration.
 - The Afterway endpoint migration needs an in-app check, especially Cloudflare challenge handling and images. If the app still gets blocked, keep that limitation documented rather than adding an unverified bypass.
 - Commit source changes separately from the existing merge commit if appropriate; push only when ready. A push runs the repository build/publish workflow and expands the catalog due to the upstream sync.
 - `afterway/` contains untracked probe artifacts from prior investigation; preserve them unless the user asks otherwise.
